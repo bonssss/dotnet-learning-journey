@@ -18,3 +18,7 @@ Exercise5.Run();
 Console.WriteLine();
 Console.WriteLine("--- Exercise 6 ---");
 Exercise6.Run();
+
+Console.WriteLine();
+Console.WriteLine("--- Exercise 7 ---");
+Exercise7.Run();
