@@ -14,3 +14,7 @@ Exercise4.Run();
 Console.WriteLine();
 Console.WriteLine("--- Exercise 5 ---");
 Exercise5.Run();
+
+Console.WriteLine();
+Console.WriteLine("--- Exercise 6 ---");
+Exercise6.Run();
