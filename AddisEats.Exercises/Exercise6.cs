@@ -27,3 +27,4 @@ public static class Exercise6
         Console.WriteLine($"copiedOrders:   [{string.Join(", ", copiedOrders)}]");
     }
 }
+

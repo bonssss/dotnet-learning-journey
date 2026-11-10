@@ -15,3 +15,4 @@ public static class Exercise4
         Console.WriteLine($"Total:        {total,10:N2}");
     }
 }
+

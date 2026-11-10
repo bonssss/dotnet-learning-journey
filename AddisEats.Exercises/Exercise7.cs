@@ -42,3 +42,4 @@ public static class Exercise7
         Console.WriteLine($"  3. Null-conditional (?): length = {length3 ?? 0}");
     }
 }
+

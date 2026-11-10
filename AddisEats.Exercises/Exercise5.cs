@@ -17,3 +17,4 @@ public static class Exercise5
         // I would use decimal division for splitting a delivery fee three ways so fractional amounts are not lost to truncation.
     }
 }
+

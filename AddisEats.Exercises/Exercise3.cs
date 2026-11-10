@@ -39,3 +39,4 @@ public static class Exercise3
         Console.WriteLine($"Type: {isFastingFriendly.GetType().Name,-7} | {nameof(isFastingFriendly)}: {isFastingFriendly}");
     }
 }
+
