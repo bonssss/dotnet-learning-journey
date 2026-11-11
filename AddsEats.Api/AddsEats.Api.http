@@ -1,0 +1,6 @@
+@AddsEats.Api_HostAddress = http://localhost:5187
+
+GET {{AddsEats.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
