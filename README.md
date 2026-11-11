@@ -94,3 +94,4 @@ To run the application entry point:
 ```bash
 dotnet run --project AddisEats.Exercises
 ```
+

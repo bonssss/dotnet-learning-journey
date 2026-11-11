@@ -1,3 +1,5 @@
+Console.WriteLine("Hello World");
+
 // using AddisEats.Exercises;
 
 // if (args.Length > 0 && (args[0].Equals("Method.cs", StringComparison.OrdinalIgnoreCase) || args[0].Equals("Method", StringComparison.OrdinalIgnoreCase)))
