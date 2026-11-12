@@ -1,6 +1,9 @@
+using AddsEats.Api.Services.MenuItemServices;
+using AddsEats.Api.Services.RestaurantServices;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
-
+builder.Services.AddScoped<IMenuItemServices, MenuItemServices>();
+builder.Services.AddScoped<IRestaurantServices, RestaurantServices>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
