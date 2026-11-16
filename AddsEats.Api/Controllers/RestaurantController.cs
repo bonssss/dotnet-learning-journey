@@ -46,5 +46,12 @@ namespace AddsEats.Api.Controllers
 
             return Ok(menu);
         }
-    }
-}
+
+        [HttpGet("active")]
+        public ActionResult<List<Restaurant>> GetActiveRestaurants()
+        {
+            var restaurants = _restaurantServices.GetAllActiveRestaurants();
+            var restaurantsDTO = restaurants.Select(r => r.ToRestaurantDTO()).ToList();
+            return Ok(restaurantsDTO);
+        }
+    }}
