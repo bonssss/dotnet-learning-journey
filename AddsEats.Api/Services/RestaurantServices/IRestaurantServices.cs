@@ -8,6 +8,7 @@ public interface IRestaurantServices
     Restaurant? GetById(int id); 
     List<Restaurant> GetAll(string? address, int page, int pageSize);
     List<MenuItem>? GetMenuByRestaurantId(int restaurantId);
+    List<Restaurant> GetAllActiveRestaurants();
 }
 
     

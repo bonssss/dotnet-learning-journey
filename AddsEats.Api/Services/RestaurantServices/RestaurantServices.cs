@@ -21,6 +21,7 @@ public class RestaurantServices : IRestaurantServices
         return restaurants;
     }
 
+
     public List<MenuItem>? GetMenuByRestaurantId(int restaurantId)
     {
         var restaurant = GetById(restaurantId);
@@ -32,5 +33,14 @@ public class RestaurantServices : IRestaurantServices
         return SeedData.menuItems
             .Where(m => m.RestaurantId == restaurantId)
             .ToList();
+    }
+
+    public List<Restaurant> GetAllActiveRestaurants()
+    {
+        var restaurants = allRestaurants
+        .Where(r => r.IsActive == true)
+        .OrderBy(r=>r.Name)
+        .ToList();
+        return restaurants;
     }
 }
