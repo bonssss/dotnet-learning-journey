@@ -1,5 +1,7 @@
 using AddsEats.Api.Models;
 using AddsEats.Api.Data;
+using AddsEats.Api.DTOs;
+
 namespace AddsEats.Api.Services.RestaurantServices;
 
 public class RestaurantServices : IRestaurantServices
@@ -9,13 +11,13 @@ public class RestaurantServices : IRestaurantServices
     {
         return allRestaurants.Where(x => x.Id == id).FirstOrDefault();
     }
-    public List<Restaurant> GetAll(string? address, int page, int pageSize)
+    public List<Restaurant> GetAll(RestaurantQuery restaurantQuery)
     {
         var restaurants = allRestaurants
-        .Where(r => address == null || r.Address ==address)
+        .Where(r => restaurantQuery.Address == null || r.Address ==restaurantQuery.Address)
         .OrderBy(r=>r.Name)
-        .Skip((page -1) * pageSize)
-        .Take(pageSize)
+        .Skip((restaurantQuery.Page -1) * restaurantQuery.PageSize)
+        .Take(restaurantQuery.PageSize)
         .ToList();
         
         return restaurants;
