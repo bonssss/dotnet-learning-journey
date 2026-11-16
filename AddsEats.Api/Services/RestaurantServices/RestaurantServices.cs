@@ -20,5 +20,17 @@ public class RestaurantServices : IRestaurantServices
         
         return restaurants;
     }
-   
+
+    public List<MenuItem>? GetMenuByRestaurantId(int restaurantId)
+    {
+        var restaurant = GetById(restaurantId);
+        if (restaurant == null)
+        {
+            return null;
+        }
+
+        return SeedData.menuItems
+            .Where(m => m.RestaurantId == restaurantId)
+            .ToList();
+    }
 }

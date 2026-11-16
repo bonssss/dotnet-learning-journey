@@ -1,6 +1,37 @@
 @AddsEats.Api_HostAddress = http://localhost:5187
 
-GET {{AddsEats.Api_HostAddress}}/weatherforecast/
+### Get all restaurants (with optional pagination and filtering)
+GET {{AddsEats.Api_HostAddress}}/api/restaurant?page=1&pageSize=10
+Accept: application/json
+
+###
+
+### Get restaurant by ID
+GET {{AddsEats.Api_HostAddress}}/api/restaurant/1
+Accept: application/json
+
+###
+
+### Get menu of a specific restaurant
+GET {{AddsEats.Api_HostAddress}}/api/restaurant/1/menu
+Accept: application/json
+
+###
+
+### Get menu of non-existent restaurant (returns 404)
+GET {{AddsEats.Api_HostAddress}}/api/restaurant/999/menu
+Accept: application/json
+
+###
+
+### Get all menu items
+GET {{AddsEats.Api_HostAddress}}/api/v1/menuitem
+Accept: application/json
+
+###
+
+### Get menu item by ID
+GET {{AddsEats.Api_HostAddress}}/api/v1/menuitem/1
 Accept: application/json
 
 ###
