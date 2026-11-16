@@ -35,3 +35,90 @@ GET {{AddsEats.Api_HostAddress}}/api/v1/menuitem/1
 Accept: application/json
 
 ###
+
+### Create an Order (Success: 201 Created)
+POST {{AddsEats.Api_HostAddress}}/api/order
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 1,
+  "customerName": "Abebe Bikila",
+  "customerPhone": "+251911223344",
+  "deliveryAddress": "Bole, Addis Ababa",
+  "quantity": 2
+}
+
+###
+
+### Create an Order - Validation Failure (400 Bad Request: missing fields, quantity 0)
+POST {{AddsEats.Api_HostAddress}}/api/order
+Content-Type: application/json
+
+{
+  "restaurantId": 0,
+  "menuItemId": 0,
+  "customerName": "",
+  "customerPhone": "invalid-phone",
+  "deliveryAddress": "",
+  "quantity": 0
+}
+
+###
+
+### Create an Order - Restaurant Not Found (404 Not Found)
+POST {{AddsEats.Api_HostAddress}}/api/order
+Content-Type: application/json
+
+{
+  "restaurantId": 9999,
+  "menuItemId": 1,
+  "customerName": "Abebe Bikila",
+  "customerPhone": "+251911223344",
+  "deliveryAddress": "Bole, Addis Ababa",
+  "quantity": 1
+}
+
+###
+
+### Create an Order - Inactive Restaurant (400 Bad Request)
+POST {{AddsEats.Api_HostAddress}}/api/order
+Content-Type: application/json
+
+{
+  "restaurantId": 2,
+  "menuItemId": 4,
+  "customerName": "Abebe Bikila",
+  "customerPhone": "+251911223344",
+  "deliveryAddress": "Ayat, Addis Ababa",
+  "quantity": 1
+}
+
+###
+
+### Create an Order - Menu Item Does Not Belong To Restaurant (400 Bad Request)
+POST {{AddsEats.Api_HostAddress}}/api/order
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "menuItemId": 4,
+  "customerName": "Abebe Bikila",
+  "customerPhone": "+251911223344",
+  "deliveryAddress": "Bole, Addis Ababa",
+  "quantity": 1
+}
+
+###
+
+### Get Order by ID (Success: 200 OK)
+GET {{AddsEats.Api_HostAddress}}/api/order/1
+Accept: application/json
+
+###
+
+### Get Non-Existent Order (404 Not Found)
+GET {{AddsEats.Api_HostAddress}}/api/order/9999
+Accept: application/json
+
+###
