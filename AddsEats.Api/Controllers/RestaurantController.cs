@@ -18,11 +18,10 @@ namespace AddsEats.Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Restaurant>> GetRestaurants([FromQuery] RestaurantQuery restaurantQuery)
+        public ActionResult<PaginatedResult<RestaurantDTO>> GetRestaurants([FromQuery] RestaurantQuery restaurantQuery)
         {
-            var restaurants = _restaurantServices.GetAll(restaurantQuery);
-            var restaurantsDTO = restaurants.Select(r => r.ToRestaurantDTO()).ToList();
-            return Ok(restaurantsDTO);
+            var result = _restaurantServices.GetAll(restaurantQuery);
+            return Ok(result);
         }
         [HttpGet("{id}")]
         public ActionResult<Restaurant> GetRestaurantById(int id)
