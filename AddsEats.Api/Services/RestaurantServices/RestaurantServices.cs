@@ -8,26 +8,28 @@ namespace AddsEats.Api.Services.RestaurantServices;
 public class RestaurantServices : IRestaurantServices
 {
     private readonly List<Restaurant> allRestaurants = SeedData.restaurants;
-    public Restaurant? GetById(int id)
+
+    public RestaurantDTO? GetById(int id)
     {
-        return allRestaurants.Where(x => x.Id == id).FirstOrDefault();
+        return allRestaurants
+            .Where(x => x.Id == id)
+            .Select(r => r.ToRestaurantDTO())
+            .FirstOrDefault();
     }
 
-    
     public PaginatedResult<RestaurantDTO> GetAll(RestaurantQuery restaurantQuery)
     {
         var restaurants = allRestaurants
-        .Where(r => restaurantQuery.Address == null || r.Address ==restaurantQuery.Address)
-        .OrderBy(r=>r.Name)
-        
-        .ToList();
+            .Where(r => restaurantQuery.Address == null || r.Address == restaurantQuery.Address)
+            .OrderBy(r => r.Name)
+            .ToList();
 
-        var totalCount= restaurants.Count();
+        var totalCount = restaurants.Count();
 
         var toReturn = restaurants
-        .Skip((restaurantQuery.Page -1) * restaurantQuery.PageSize)
-        .Take(restaurantQuery.PageSize)
-        .ToList();
+            .Skip((restaurantQuery.Page - 1) * restaurantQuery.PageSize)
+            .Take(restaurantQuery.PageSize)
+            .ToList();
 
         PaginatedResult<RestaurantDTO> resultDTO = new PaginatedResult<RestaurantDTO>
         {
@@ -39,7 +41,6 @@ public class RestaurantServices : IRestaurantServices
         
         return resultDTO;
     }
-
 
     public List<MenuItem>? GetMenuByRestaurantId(int restaurantId)
     {
@@ -54,12 +55,14 @@ public class RestaurantServices : IRestaurantServices
             .ToList();
     }
 
-    public List<Restaurant> GetAllActiveRestaurants()
+    public List<RestaurantDTO> GetAllActiveRestaurants()
     {
         var restaurants = allRestaurants
-        .Where(r => r.IsActive == true)
-        .OrderBy(r=>r.Name)
-        .ToList();
+            .Where(r => r.IsActive)
+            .OrderBy(r => r.Name)
+            .Select(r => r.ToRestaurantDTO())
+            .ToList();
+
         return restaurants;
     }
 }

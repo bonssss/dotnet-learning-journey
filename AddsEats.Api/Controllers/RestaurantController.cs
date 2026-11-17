@@ -23,8 +23,9 @@ namespace AddsEats.Api.Controllers
             var result = _restaurantServices.GetAll(restaurantQuery);
             return Ok(result);
         }
+
         [HttpGet("{id}")]
-        public ActionResult<Restaurant> GetRestaurantById(int id)
+        public ActionResult<RestaurantDTO> GetRestaurantById(int id)
         {
             var restaurant = _restaurantServices.GetById(id);
             if (restaurant == null)
@@ -47,10 +48,10 @@ namespace AddsEats.Api.Controllers
         }
 
         [HttpGet("active")]
-        public ActionResult<List<Restaurant>> GetActiveRestaurants()
+        public ActionResult<List<RestaurantDTO>> GetActiveRestaurants()
         {
-            var restaurants = _restaurantServices.GetAllActiveRestaurants();
-            var restaurantsDTO = restaurants.Select(r => r.ToRestaurantDTO()).ToList();
+            var restaurantsDTO = _restaurantServices.GetAllActiveRestaurants();
             return Ok(restaurantsDTO);
         }
-    }}
+    }
+}

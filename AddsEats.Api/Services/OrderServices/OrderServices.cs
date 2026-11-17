@@ -3,8 +3,10 @@ namespace AddsEats.Api.Services.OrderServices;
 using AddsEats.Api.Models;
 using AddsEats.Api.DTOs;
 using AddsEats.Api.Data;
+using AddsEats.Api.Common;
+using AddsEats.Api.Services.RestaurantServices;
 
-public class OrderServices : IOrderServices
+public class OrderServices(IRestaurantServices restaurantServices) : IOrderServices
 {
     private static readonly List<Order> _orders = new List<Order>();
     private static int _nextId = 1;
@@ -18,32 +20,44 @@ public class OrderServices : IOrderServices
         }
     }
 
-    public Order CreateOrder(CreateOrderDTO newOrder)
+    public Result<Order> CreateOrder(CreateOrderDTO newOrder)
     {
-        // 1. Verify restaurant exists
-        var restaurant = SeedData.restaurants.FirstOrDefault(r => r.Id == newOrder.RestaurantId);
+        // 1. Verify restaurant exists from Restaurant DTO
+        var restaurant = restaurantServices.GetById(newOrder.RestaurantId);
         if (restaurant == null)
         {
-            throw new KeyNotFoundException($"Restaurant with ID {newOrder.RestaurantId} does not exist.");
+            return Result<Order>.Failure(
+                "NotFound",
+                $"Restaurant with ID {newOrder.RestaurantId} does not exist.",
+                404);
         }
 
         // 2. Verify restaurant is active
         if (!restaurant.IsActive)
         {
-            throw new InvalidOperationException($"Restaurant '{restaurant.Name}' is currently inactive and cannot accept orders.");
+            return Result<Order>.Failure(
+                "InactiveRestaurant",
+                $"Restaurant '{restaurant.Name}' is currently inactive and cannot accept orders.",
+                400);
         }
 
         // 3. Verify menu item exists
         var menuItem = SeedData.menuItems.FirstOrDefault(m => m.Id == newOrder.MenuItemId);
         if (menuItem == null)
         {
-            throw new KeyNotFoundException($"Menu item with ID {newOrder.MenuItemId} does not exist.");
+            return Result<Order>.Failure(
+                "NotFound",
+                $"Menu item with ID {newOrder.MenuItemId} does not exist.",
+                404);
         }
 
         // 4. Verify menu item belongs to the restaurant
         if (menuItem.RestaurantId != newOrder.RestaurantId)
         {
-            throw new ArgumentException($"Menu item '{menuItem.Name}' (ID {menuItem.Id}) does not belong to restaurant '{restaurant.Name}' (ID {restaurant.Id}).");
+            return Result<Order>.Failure(
+                "InvalidMenuItem",
+                $"Menu item '{menuItem.Name}' (ID {menuItem.Id}) does not belong to restaurant '{restaurant.Name}' (ID {restaurant.Id}).",
+                400);
         }
 
         // 5. Server-side total calculation (prevents client price tampering)
@@ -67,6 +81,6 @@ public class OrderServices : IOrderServices
             _orders.Add(order);
         }
 
-        return order;
+        return Result<Order>.Success(order);
     }
 }

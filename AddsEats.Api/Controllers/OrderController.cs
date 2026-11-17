@@ -4,6 +4,7 @@ using AddsEats.Api.Models;
 using AddsEats.Api.Services.OrderServices;
 using Microsoft.AspNetCore.Mvc;
 using AddsEats.Api.DTOs;
+using AddsEats.Api.Common;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -23,22 +24,13 @@ public class OrderController(IOrderServices orderService) : ControllerBase
     [HttpPost]
     public ActionResult<Order> CreateOrder([FromBody] CreateOrderDTO createOrderDto)
     {
-        try
+        var result = orderService.CreateOrder(createOrderDto);
+        if (!result.IsSuccess)
         {
-            var order = orderService.CreateOrder(createOrderDto);
-            return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
+            return StatusCode(result.Error!.StatusCode, result.Error);
         }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+
+        var order = result.Value!;
+        return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
     }
 }
