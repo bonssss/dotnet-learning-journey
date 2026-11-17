@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-
+using AddsEats.Api.Validation;
 namespace AddsEats.Api.DTOs;
 
 public record CreateOrderDTO(
@@ -14,7 +14,7 @@ public record CreateOrderDTO(
     string CustomerName,
 
     [Required(ErrorMessage = "CustomerPhone is required")]
-    [Phone(ErrorMessage = "CustomerPhone is not a valid phone number")]
+    [EthiopianMobile(ErrorMessage = "CustomerPhone is not a valid phone number")]
     string CustomerPhone,
 
     [Required(ErrorMessage = "DeliveryAddress is required")]
