@@ -1,6 +1,15 @@
 
 using Exercises.AddisEats.Exercises;
 
+if (args.Length > 0 && args[0].Equals("day3", StringComparison.OrdinalIgnoreCase))
+{
+    if (args.Length > 1 && int.TryParse(args[1], out int day3ExerciseNumber))
+        AddisEats.Exercises.Day3Exercises.Day3Runner.Run(day3ExerciseNumber);
+    else
+        AddisEats.Exercises.Day3Exercises.Day3Runner.Run();
+    return;
+}
+
 if (args.Length > 0 && (args[0].Equals("Method.cs", StringComparison.OrdinalIgnoreCase) || args[0].Equals("Method", StringComparison.OrdinalIgnoreCase)))
 {
     Method.Run();
