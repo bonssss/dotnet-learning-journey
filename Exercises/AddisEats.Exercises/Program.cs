@@ -1,13 +1,12 @@
 
 using Exercises.AddisEats.Exercises;
-using AddisEats.Exercises.Day3Exercises;
 
 if (args.Length > 0 && args[0].Equals("day3", StringComparison.OrdinalIgnoreCase))
 {
     if (args.Length > 1 && int.TryParse(args[1], out int day3ExerciseNumber))
-        Day3Runner.Run(day3ExerciseNumber);
+        AddisEats.Exercises.Day3Exercises.Day3Runner.Run(day3ExerciseNumber);
     else
-        Day3Runner.Run();
+        AddisEats.Exercises.Day3Exercises.Day3Runner.Run();
     return;
 }
 
