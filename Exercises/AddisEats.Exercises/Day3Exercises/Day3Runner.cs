@@ -18,9 +18,11 @@ public static class Day3Runner
             Console.WriteLine();
             Exercise6.Run();
             Console.WriteLine();
+            Exercise7.Run();
+            Console.WriteLine();
             if (exerciseNumber is null)
             {
-                Console.WriteLine("(Day 3 exercises 7-8 not yet added)");
+                Console.WriteLine("(Day 3 exercise 8 not yet added)");
             }
         }
 
@@ -50,8 +52,11 @@ public static class Day3Runner
             case 6:
                 Exercise6.Run();
                 break;
+            case 7:
+                Exercise7.Run();
+                break;
             default:
-                Console.WriteLine($"Unknown Day 3 exercise number: {exerciseNumber}. Available: 1-6");
+                Console.WriteLine($"Unknown Day 3 exercise number: {exerciseNumber}. Available: 1-7");
                 break;
         }
     }
