@@ -1,13 +1,4 @@
-namespace AddisEats.Exercises.Day3Exercises;
-
-public class Order
-{
-    public int Id { get; init; }
-    public string CustomerName { get; init; } = string.Empty;
-    public string Area { get; init; } = string.Empty;
-    public decimal AmountEtb { get; init; }
-    public DateTime CreatedAt { get; init; }
-}
+namespace AddisEats.Catalog;
 
 public static class Exercise5
 {

@@ -1,25 +1,4 @@
-namespace AddisEats.Exercises.Day3Exercises;
-
-public interface IDiscountPolicy
-{
-    decimal Apply(decimal amount);
-}
-
-public class TenPercentOffPolicy : IDiscountPolicy
-{
-    public decimal Apply(decimal amount) => amount * 0.90m;
-}
-
-public class FiftyEtbOffPolicy : IDiscountPolicy
-{
-    public decimal Apply(decimal amount) => Math.Max(0m, amount - 50m);
-}
-
-// Third policy added without changing the method that accepts IDiscountPolicy
-public class VipTwentyPercentOffPolicy : IDiscountPolicy
-{
-    public decimal Apply(decimal amount) => amount * 0.80m;
-}
+namespace AddisEats.Catalog;
 
 public static class Exercise6
 {

@@ -1,13 +1,4 @@
-namespace AddisEats.Exercises.Day3Exercises;
-
-public class Restaurant
-{
-    public int Id { get; init; }
-    public string Name { get; set; } = string.Empty;
-    public string Area { get; set; } = string.Empty;
-
-    public string DisplayName => $"{Name} ({Area})";
-}
+namespace AddisEats.Catalog;
 
 public static class Exercise3
 {

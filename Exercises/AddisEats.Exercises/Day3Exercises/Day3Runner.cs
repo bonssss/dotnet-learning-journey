@@ -10,20 +10,17 @@ public static class Day3Runner
             Console.WriteLine();
             Exercise2.Run();
             Console.WriteLine();
-            Exercise3.Run();
+            AddisEats.Catalog.Exercise3.Run();
             Console.WriteLine();
-            Exercise4.Run();
+            AddisEats.Catalog.Exercise4.Run();
             Console.WriteLine();
-            Exercise5.Run();
+            AddisEats.Catalog.Exercise5.Run();
             Console.WriteLine();
-            Exercise6.Run();
+            AddisEats.Catalog.Exercise6.Run();
             Console.WriteLine();
-            Exercise7.Run();
+            AddisEats.Catalog.Exercise7.Run();
             Console.WriteLine();
-            if (exerciseNumber is null)
-            {
-                Console.WriteLine("(Day 3 exercise 8 not yet added)");
-            }
+            Console.WriteLine("Exercise 8: exercises 3-7 organized into namespace AddisEats.Catalog, one type per file. Build and run confirmed.");
         }
 
         if (exerciseNumber is null)
@@ -41,22 +38,25 @@ public static class Day3Runner
                 Exercise2.Run();
                 break;
             case 3:
-                Exercise3.Run();
+                AddisEats.Catalog.Exercise3.Run();
                 break;
             case 4:
-                Exercise4.Run();
+                AddisEats.Catalog.Exercise4.Run();
                 break;
             case 5:
-                Exercise5.Run();
+                AddisEats.Catalog.Exercise5.Run();
                 break;
             case 6:
-                Exercise6.Run();
+                AddisEats.Catalog.Exercise6.Run();
                 break;
             case 7:
-                Exercise7.Run();
+                AddisEats.Catalog.Exercise7.Run();
+                break;
+            case 8:
+                RunAll();
                 break;
             default:
-                Console.WriteLine($"Unknown Day 3 exercise number: {exerciseNumber}. Available: 1-7");
+                Console.WriteLine($"Unknown Day 3 exercise number: {exerciseNumber}. Available: 1-8");
                 break;
         }
     }

@@ -1,18 +1,4 @@
-namespace AddisEats.Exercises.Day3Exercises;
-
-public record Customer(string Name, string PhoneNumber);
-
-public class CustomerClass
-{
-    public CustomerClass(string name, string phoneNumber)
-    {
-        Name = name;
-        PhoneNumber = phoneNumber;
-    }
-
-    public string Name { get; }
-    public string PhoneNumber { get; }
-}
+namespace AddisEats.Catalog;
 
 public static class Exercise4
 {

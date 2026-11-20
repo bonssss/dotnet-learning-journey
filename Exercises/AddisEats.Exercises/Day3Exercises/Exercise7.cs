@@ -1,4 +1,4 @@
-namespace AddisEats.Exercises.Day3Exercises;
+namespace AddisEats.Catalog;
 
 public static class Exercise7
 {
