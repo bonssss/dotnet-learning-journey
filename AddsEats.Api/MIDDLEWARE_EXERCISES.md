@@ -157,3 +157,52 @@ curl -s "http://localhost:5187/api/diagnostics/concurrency-test?client=Terminal-
 * **Terminal A Instance:** `50699812-541c-4700-817d-3e208590260c`
 * **Terminal B Instance:** `04fe086b-6e97-43a4-b90b-5937ac2a6b2e`
 Each request receives its own isolated instance. Concurrency races and cross-client data leakage are eliminated.
+
+---
+
+## Exercise 6: Inverting Middleware Order (`UseAuthorization` before `UseAuthentication`)
+
+### Setup on Scratch Branch: `scratch/auth-order-experiment`
+In a dedicated scratch branch, the pipeline was configured intentionally in the inverted order:
+```csharp
+// WRONG ORDER (Exercise 6 Experiment):
+app.UseAuthorization();
+app.UseAuthentication();
+
+app.MapGet("/api/protected/profile", (HttpContext ctx) =>
+{
+    return Results.Ok(new { message = "Access granted" });
+}).RequireAuthorization();
+```
+
+### Client Request:
+```bash
+curl -i -H "Authorization: Bearer valid-sample-jwt-token" http://localhost:5187/api/protected/profile
+```
+
+### Exact Observed Server Response:
+```http
+HTTP/1.1 401 Unauthorized
+Content-Length: 0
+Date: Thu, 26 Nov 2026 14:07:21 GMT
+Server: Kestrel
+X-Correlation-Id: 08b69b7b-ddea-4c69-b439-9ecd2ef049f8
+```
+
+### Exact Observed Server Logs:
+```text
+info: DemoBearerAuthHandler[12]
+      AuthenticationScheme: Bearer was challenged.
+info: AddsEats.Api.Middleware.RequestTimingMiddleware[0]
+      [08b69b7b-ddea-4c69-b439-9ecd2ef049f8] HTTP GET /api/protected/profile responded 401 in 19ms
+```
+
+### Explanation of the Failure:
+1. **Pipeline Execution Order:** Middleware executes sequentially in the order registered in `Program.cs`.
+2. **`UseAuthorization` before `UseAuthentication`:**
+   * When `UseAuthorization` runs, it inspects `context.User`.
+   * Because `UseAuthentication` has **not** executed yet, the `Authorization: Bearer ...` header has not been read, validated, or mapped to `ClaimsPrincipal`. `context.User.Identity.IsAuthenticated` is still `false` (anonymous).
+   * Since the endpoint requires an authenticated user (`RequireAuthorization()`), `UseAuthorization` considers the request unauthorized, issues an authentication challenge (setting status code `401 Unauthorized`), and **short-circuits** the pipeline.
+   * `UseAuthentication` is never reached. Even a client providing a 100% valid JWT token is rejected with `401 Unauthorized`.
+3. **Rule:** **`UseAuthentication()` must always precede `UseAuthorization()`** in the pipeline.
+
