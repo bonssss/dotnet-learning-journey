@@ -4,6 +4,7 @@ using AddsEats.Api.Configurarions;
 using AddsEats.Api.Middleware;
 using AddsEats.Api.Models;
 using AddsEats.Api.Services;
+using AddsEats.Api.Services.Diagnostics;
 using AddsEats.Api.Services.MenuItemServices;
 using AddsEats.Api.Services.OrderServices;
 using AddsEats.Api.Services.RestaurantServices;
@@ -16,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddScoped<IScopedStateService, ScopedStateService>();
 builder.Services.AddScoped<IMenuItemServices, MenuItemServices>();
 builder.Services.AddScoped<IRestaurantServices, RestaurantServices>();
 builder.Services.AddScoped<IOrderServices, OrderServices>();
@@ -65,6 +67,7 @@ var app = builder.Build();
 // Middleware pipeline (Exercise 1, 2, 3)
 app.UseCorrelationId();
 app.UseRequestTiming();
+app.UseScopedServiceExperiment();
 
 if (app.Environment.IsDevelopment())
 {
