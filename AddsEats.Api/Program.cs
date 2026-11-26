@@ -1,8 +1,11 @@
 using System.IO;
 using System.Reflection;
 using AddsEats.Api.Configurarions;
+using AddsEats.Api.Filters;
+using AddsEats.Api.Middleware;
 using AddsEats.Api.Models;
 using AddsEats.Api.Services;
+using AddsEats.Api.Services.Diagnostics;
 using AddsEats.Api.Services.MenuItemServices;
 using AddsEats.Api.Services.OrderServices;
 using AddsEats.Api.Services.RestaurantServices;
@@ -12,9 +15,14 @@ using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    // Exercise 7: Global audit filter logging action name and bound arguments
+    options.Filters.Add<AuditActionFilter>();
+});
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddScoped<IScopedStateService, ScopedStateService>();
 builder.Services.AddScoped<IMenuItemServices, MenuItemServices>();
 builder.Services.AddScoped<IRestaurantServices, RestaurantServices>();
 builder.Services.AddScoped<IOrderServices, OrderServices>();
@@ -61,6 +69,11 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Middleware pipeline (Exercise 1, 2, 3)
+app.UseCorrelationId();
+app.UseRequestTiming();
+app.UseScopedServiceExperiment();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -73,6 +86,30 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
+// Exercise 4: ApiKeyMiddleware applied strictly to the /admin branch via app.Map
+app.Map("/admin", adminApp =>
+{
+    adminApp.UseMiddleware<ApiKeyMiddleware>();
+
+    adminApp.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            status = "Success",
+            message = "Welcome to the secure AddsEats Admin area.",
+            serverTimeUtc = DateTime.UtcNow
+        });
+    });
+});
+
 app.MapControllers();
+
+app.MapGet("/api/diagnostics/slow", async () =>
+{
+    await Task.Delay(1050);
+    return Results.Ok(new { message = "Simulated slow response" });
+});
 
 app.Run();
