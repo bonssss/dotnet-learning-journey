@@ -1,6 +1,7 @@
 using System.IO;
 using System.Reflection;
 using AddsEats.Api.Configurarions;
+using AddsEats.Api.Filters;
 using AddsEats.Api.Middleware;
 using AddsEats.Api.Models;
 using AddsEats.Api.Services;
@@ -14,7 +15,11 @@ using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    // Exercise 7: Global audit filter logging action name and bound arguments
+    options.Filters.Add<AuditActionFilter>();
+});
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<IScopedStateService, ScopedStateService>();

@@ -206,3 +206,34 @@ info: AddsEats.Api.Middleware.RequestTimingMiddleware[0]
    * `UseAuthentication` is never reached. Even a client providing a 100% valid JWT token is rejected with `401 Unauthorized`.
 3. **Rule:** **`UseAuthentication()` must always precede `UseAuthorization()`** in the pipeline.
 
+---
+
+## Exercise 7: `AuditActionFilter` & The Middleware vs. Filter Boundary
+
+* **File:** [`Filters/AuditActionFilter.cs`](file:///home/bonsa/Documents/dotnet-backend/AddsEats.Api/Filters/AuditActionFilter.cs)
+* **Goal:** Log the executing action name and its bound arguments.
+* **Registration:** In [`Program.cs`](file:///home/bonsa/Documents/dotnet-backend/AddsEats.Api/Program.cs):
+  ```csharp
+  builder.Services.AddControllers(options =>
+  {
+      options.Filters.Add<AuditActionFilter>();
+  });
+  ```
+
+### Why this could NOT be middleware (One-line explanation):
+> **Middleware executes before MVC routing and model binding take place, meaning the selected action descriptor and the deserialized, strongly-typed arguments do not exist in the HttpContext yet.**
+
+### Verification Log Sample:
+When calling `GET /api/v1/menuitem/1`:
+```text
+info: AddsEats.Api.Filters.AuditActionFilter[0]
+      [49c81bb7-a6fa-45b7-8ce6-90e18146eb13] [Audit] Executing Action: AddsEats.Api.Controllers.MenuItemController.GetById (AddsEats.Api) with Arguments: {"id":1}
+```
+When calling `POST /api/order` with a JSON payload:
+```text
+info: AddsEats.Api.Filters.AuditActionFilter[0]
+      [a129ef60-8488-4660-802f-b4270b20a3bc] [Audit] Executing Action: AddsEats.Api.Controllers.OrderController.CreateOrder (AddsEats.Api) with Arguments: {"createOrderDto":{"restaurantId":1,"menuItemId":1,"customerName":"Abebe Bikila","customerPhone":"+251911223344","deliveryAddress":"Bole, Addis Ababa","quantity":2,"totalAmount":500.0}}
+```
+Notice that `AuditActionFilter` has access to the actual deserialized C# object `createOrderDto` with all strongly-typed values already bound, which middleware can never inspect without duplicating model binding.
+
+
