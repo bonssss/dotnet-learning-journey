@@ -1,6 +1,7 @@
 using System.IO;
 using System.Reflection;
 using AddsEats.Api.Configurarions;
+using AddsEats.Api.Middleware;
 using AddsEats.Api.Models;
 using AddsEats.Api.Services;
 using AddsEats.Api.Services.MenuItemServices;
@@ -61,6 +62,10 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Middleware pipeline (Exercise 1, 2, 3)
+app.UseCorrelationId();
+app.UseRequestTiming();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -74,5 +79,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapGet("/api/diagnostics/slow", async () =>
+{
+    await Task.Delay(1050);
+    return Results.Ok(new { message = "Simulated slow response" });
+});
 
 app.Run();
