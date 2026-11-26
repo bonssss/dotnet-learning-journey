@@ -60,6 +60,13 @@ AddsEats.Api/
 │   ├── RestaurantQuery.cs    # Pagination & filter query parameters
 │   ├── PaginatedResult.cs    # Generic pagination envelope (Items, Page, TotalPages, TotalCount)
 │   └── CreateOrderDTO.cs     # Input model with Data Annotations validation
+├── Middleware/               # Custom pipeline middleware
+│   ├── CorrelationIdMiddleware.cs        # X-Correlation-Id generation & TraceIdentifier setup
+│   ├── RequestTimingMiddleware.cs        # Execution timing & slow request warning logger
+│   ├── ApiKeyMiddleware.cs               # Admin API key authentication & short-circuiting
+│   └── ScopedServiceExperimentMiddleware.cs # Concurrency & scoped service resolution demo
+├── Filters/                  # MVC action & result filters
+│   └── AuditActionFilter.cs  # Action name & bound arguments audit logger
 ├── Mappers/                  # Extension mappers
 │   └── RestaurantMapper.cs   # Maps Restaurant -> RestaurantDTO
 ├── Common/                   # Cross-cutting concerns & patterns
@@ -69,10 +76,64 @@ AddsEats.Api/
 │   └── ETBAmountAttribute.cs       # ETB currency validator
 ├── Data/                     # In-memory storage & seed data
 │   └── SeedData.cs           # Seed restaurants and menu items
-├── Program.cs                # Application entry point, middleware & DI registration
+├── Program.cs                # Application entry point, middleware pipeline & DI registration
+├── MIDDLEWARE_EXERCISES.md   # Complete documentation & experiments for the 8 exercises
 ├── AddsEats.Api.http         # Ready-to-run HTTP test requests
 └── appsettings.json          # Application configuration
 ```
+
+---
+
+## 🧱 Middleware Pipeline Architecture & Line-by-Line Breakdown
+
+The ASP.NET Core pipeline in [`Program.cs`](file:///home/bonsa/Documents/dotnet-backend/AddsEats.Api/Program.cs) processes requests sequentially as they travel down to the endpoint and back up through the response chain. The exact order is deliberate and critical:
+
+```text
+Incoming Request
+      │
+      ▼
+1.  app.UseCorrelationId()            ──► Extracts/generates X-Correlation-Id & sets TraceIdentifier
+      │
+      ▼
+2.  app.UseRequestTiming()            ──► Starts Stopwatch; logs method, path, status, and duration
+      │
+      ▼
+3.  app.UseScopedServiceExperiment()  ──► Demonstrates per-request scoped service resolution (InvokeAsync)
+      │
+      ▼
+4.  app.UseSwagger() & UseSwaggerUI() ──► Serves OpenAPI JSON and interactive UI in Development
+      │
+      ▼
+5.  app.UseHttpsRedirection()         ──► Redirects HTTP to HTTPS before reaching auth or business logic
+      │
+      ▼
+6.  app.Map("/admin", adminApp => ...)──► Branches pipeline; ApiKeyMiddleware protects admin branch
+      │
+      ▼
+7.  app.UseAuthorization()            ──► Evaluates user identity and endpoint authorization policies
+      │
+      ▼
+8.  app.MapControllers()              ──► Executes matched controller action & Action Filters (AuditFilter)
+      │
+      ▼
+Outgoing Response (traverses back up through OnStarting headers & timing calculations)
+```
+
+### Detailed Line-by-Line Pipeline Analysis
+
+| Pipeline Code Line | Position & Function | Reason for this Position |
+| :--- | :--- | :--- |
+| `1. app.UseCorrelationId();` | **Top of pipeline (1st)** | Must execute before any logging or downstream middleware so that `context.TraceIdentifier` is populated early. Sets response header via `OnStarting()`. |
+| `2. app.UseRequestTiming();` | **Directly after Correlation ID (2nd)** | Measures total request duration including all downstream execution, routing, and filters. Because it runs after `UseCorrelationId()`, its logs automatically include `TraceIdentifier`. |
+| `3. app.UseScopedServiceExperiment();` | **Diagnostic/Utility (3rd)** | Demonstrates safe per-request scoped service resolution via `InvokeAsync` rather than constructor injection, preventing captive dependencies under concurrency. |
+| `4. app.UseSwagger(); & app.UseSwaggerUI();` | **Development Tools (4th)** | Exposes API schema and interactive testing UI early in development without needing database or auth processing for raw doc assets. |
+| `5. app.UseHttpsRedirection();` | **Security / Transport (5th)** | Ensures all communication is encrypted over HTTPS before headers, API keys, or credentials pass into sensitive branches or controllers. |
+| `6. app.Map("/admin", adminApp => ...);` | **Branching Pipeline (6th)** | Creates a branched sub-pipeline specifically for the `/admin` path where `ApiKeyMiddleware` verifies the `X-Api-Key` header and short-circuits unauthorized calls without polluting public routes. |
+| `7. app.UseAuthorization();` | **Security Policy (7th)** | Checks whether the caller has permission to access the target resource. *(Must always be placed after `UseAuthentication()` when authentication handlers are configured).* |
+| `8. app.MapControllers();` | **Endpoint Execution (8th)** | Matches routes to Controller actions, executes Model Binding, and triggers Action Filters such as `AuditActionFilter`. |
+| `9. app.Run();` | **Pipeline Terminator** | Begins listening for incoming connections and executes the compiled pipeline. |
+
+For detailed experimental observations (including concurrency bug replication and ordering gotchas), see **[MIDDLEWARE_EXERCISES.md](file:///home/bonsa/Documents/dotnet-backend/AddsEats.Api/MIDDLEWARE_EXERCISES.md)**.
 
 ---
 
