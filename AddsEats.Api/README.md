@@ -170,6 +170,35 @@ AddsEats.Api/
 
 ---
 
+### 4. Authentication (`/api/auth`)
+
+| Method | Endpoint | Description | Status Codes |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/login` | Log in a demo user and receive a JWT | `200 OK`, `400 Bad Request` |
+
+#### Example Request: `POST /api/auth/login`
+```json
+{
+  "phoneNumber": "0911111111",
+  "password": "123456"
+}
+```
+
+#### Example Success Response (`200 OK`)
+```json
+{
+  "accessToken": "<jwt>",
+  "tokenType": "Bearer",
+  "expiresAtUtc": "2026-11-26T11:02:19Z"
+}
+```
+
+Use the token in Swagger UI with the **Authorize** button, or send it as `Authorization: Bearer <accessToken>`.
+
+> Swagger descriptions come from XML doc comments on controllers, DTOs, and models. The JWT signing key is configured via `Jwt:SigningKey` in `appsettings.json`; override it with user-secrets or environment variables outside development.
+
+---
+
 ## 🏃 Running the Application
 
 ### Prerequisites
