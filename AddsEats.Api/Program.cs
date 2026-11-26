@@ -78,6 +78,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
+// Exercise 4: ApiKeyMiddleware applied strictly to the /admin branch via app.Map
+app.Map("/admin", adminApp =>
+{
+    adminApp.UseMiddleware<ApiKeyMiddleware>();
+
+    adminApp.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            status = "Success",
+            message = "Welcome to the secure AddsEats Admin area.",
+            serverTimeUtc = DateTime.UtcNow
+        });
+    });
+});
+
 app.MapControllers();
 
 app.MapGet("/api/diagnostics/slow", async () =>
