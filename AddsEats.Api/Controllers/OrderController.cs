@@ -5,6 +5,7 @@ using AddsEats.Api.DTOs;
 using AddsEats.Api.Models;
 using AddsEats.Api.Services.OrderServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 /// <summary>
 /// Place orders and retrieve their details. Totals are always computed on the server.
@@ -21,6 +22,7 @@ public class OrderController(IOrderServices orderService) : ControllerBase
     /// <returns>The stored order.</returns>
     /// <response code="200">The order was found.</response>
     /// <response code="404">No order exists with the given id.</response>
+    // [Authorize]
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

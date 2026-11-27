@@ -1,5 +1,6 @@
 using System.IO;
 using System.Reflection;
+using System.Text;
 using AddsEats.Api.Configurarions;
 using AddsEats.Api.Filters;
 using AddsEats.Api.Middleware;
@@ -10,7 +11,9 @@ using AddsEats.Api.Services.MenuItemServices;
 using AddsEats.Api.Services.OrderServices;
 using AddsEats.Api.Services.RestaurantServices;
 using AddsEats.Api.Services.UserServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +33,27 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddSingleton<DemoUserServices>();
+
+var jwtSigningKey = builder.Configuration["Jwt:SigningKey"]
+    ?? builder.Configuration["Jwt:Signingkey"]
+    ?? "AddsEats-Development-Signing-Key-Change-Me-1234567890";
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "addiseats-api",
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "addiseats-client",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSigningKey))
+    };
+});
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -63,8 +87,13 @@ builder.Services.AddSwaggerGen(options =>
         Description = "JWT access token from POST /api/auth/login. Enter only the token, without the 'Bearer ' prefix."
     });
 
-    // The "Authorize" button is available for protected endpoints added later.
-    // No global requirement is added, so today's public endpoints are not marked as authenticated.
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document),
+            new List<string>()
+        }
+    });
 });
 
 var app = builder.Build();
@@ -85,6 +114,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Exercise 4: ApiKeyMiddleware applied strictly to the /admin branch via app.Map
