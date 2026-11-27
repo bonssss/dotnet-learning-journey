@@ -43,7 +43,7 @@ public class AuthController : ControllerBase
     /// <response code="400">The request is invalid or the credentials are wrong.</response>
     [HttpPost("login")]
     [ProducesResponseType(typeof(LoginResponseDTO), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginDTO request)
     {
         if (!ModelState.IsValid)
@@ -54,13 +54,13 @@ public class AuthController : ControllerBase
         var user = await _demoUserServices.GetByPhoneNumberAsync(request.PhoneNumber);
         if (user == null)
         {
-            return BadRequest(new { message = "Invalid credentials" });
+            return Unauthorized(new { message = "Invalid credentials" });
         }
 
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (result == PasswordVerificationResult.Failed)
         {
-            return BadRequest(new { message = "Invalid credentials" });
+            return Unauthorized(new { message = "Invalid credentials" });
         }
 
         if (result == PasswordVerificationResult.SuccessRehashNeeded)

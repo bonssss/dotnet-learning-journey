@@ -3,6 +3,7 @@ using AddsEats.Api.Mappers;
 using AddsEats.Api.Models;
 using AddsEats.Api.Services.RestaurantServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AddsEats.Api.Controllers
 {
@@ -27,6 +28,7 @@ namespace AddsEats.Api.Controllers
         /// <param name="restaurantQuery">Pagination (<c>page</c>, <c>pageSize</c>) and optional <c>address</c> filter.</param>
         /// <returns>A page of restaurant summaries with pagination metadata.</returns>
         /// <response code="200">The requested page was returned.</response>
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(typeof(PaginatedResult<RestaurantDTO>), StatusCodes.Status200OK)]
         public ActionResult<PaginatedResult<RestaurantDTO>> GetRestaurants([FromQuery] RestaurantQuery restaurantQuery)
